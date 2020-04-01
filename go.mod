@@ -11,7 +11,9 @@ require (
 	github.com/google/uuid v1.1.1 // indirect
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/kr/pretty v0.2.0 // indirect
+	go.mongodb.org/mongo-driver v1.3.1 // indirect
 	go.uber.org/zap v1.14.1 // indirect
+
 )
 
 replace github.com/coreos/go-systemd => github.com/coreos/go-systemd/v22 v22.0.0
