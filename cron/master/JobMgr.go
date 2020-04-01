@@ -3,7 +3,6 @@ package master
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/coreos/etcd/clientv3"
 	"prepare/cron/common"
 	"time"
@@ -67,7 +66,6 @@ func (jobMgr *JobMgr) SaveJob(job *common.Job) (oldJob *common.Job, err error) {
 
 	// etcd的保存key
 	jobKey = "/cron/jobs/" + job.Name
-	fmt.Println(jobKey)
 	// 任务信息json
 	if jobValue, err = json.Marshal(job); err != nil {
 		return
