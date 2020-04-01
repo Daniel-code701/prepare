@@ -10,21 +10,21 @@ import (
 
 func main() {
 	var (
-		config clientv3.Config
-		client *clientv3.Client
-		err error
-		kv clientv3.KV
+		config  clientv3.Config
+		client  *clientv3.Client
+		err     error
+		kv      clientv3.KV
 		watcher clientv3.Watcher
 		//putResp *clientv3.PutResponse
-		getResp *clientv3.GetResponse
+		getResp            *clientv3.GetResponse
 		watchStartRevision int64
-		watchRespChan <-chan clientv3.WatchResponse
-		watchRsp clientv3.WatchResponse
-		event *clientv3.Event
+		watchRespChan      <-chan clientv3.WatchResponse
+		watchRsp           clientv3.WatchResponse
+		event              *clientv3.Event
 	)
 	config = clientv3.Config{
-		Endpoints:[]string{"127.0.0.1:2379"},
-		DialTimeout:5 *time.Second,
+		Endpoints:   []string{"127.0.0.1:2379"},
+		DialTimeout: 5 * time.Second,
 	}
 	//建立连接
 	if client, err = clientv3.New(config); err != nil {
@@ -45,13 +45,13 @@ func main() {
 	}()
 
 	//先get当前的值 再监听变化
-	if getResp,err = kv.Get(context.TODO(),"/corn/jobs/job1"); err != nil{
+	if getResp, err = kv.Get(context.TODO(), "/corn/jobs/job1"); err != nil {
 		fmt.Println(err)
 		return
 	}
 	//现在key值存在
 	if len(getResp.Kvs) != 0 {
-		fmt.Println("当前值",string(getResp.Kvs[0].Value))
+		fmt.Println("当前值", string(getResp.Kvs[0].Value))
 	}
 	//当前etcd集群事物id
 	watchStartRevision = getResp.Header.Revision + 1
@@ -60,28 +60,24 @@ func main() {
 	watcher = clientv3.NewWatcher(client)
 
 	//启动监听
-	fmt.Println("从该版本向后监听",watchStartRevision)
-
+	fmt.Println("从该版本向后监听", watchStartRevision)
 
 	//模拟一个取消操作
-	ctx,cancelFunc := context.WithCancel(context.TODO())
-	time.AfterFunc(5 *time.Second, func() {
+	ctx, cancelFunc := context.WithCancel(context.TODO())
+	time.AfterFunc(5*time.Second, func() {
 		cancelFunc()
 	})
 
-	watchRespChan = watcher.Watch(ctx,"/corn/jobs/job1",clientv3.WithRev(watchStartRevision))
-
-
-
+	watchRespChan = watcher.Watch(ctx, "/corn/jobs/job1", clientv3.WithRev(watchStartRevision))
 
 	//处理变化事件
 	for watchRsp = range watchRespChan {
-		for _,event = range watchRsp.Events {
+		for _, event = range watchRsp.Events {
 			switch event.Type {
 			case mvccpb.PUT:
-				fmt.Println("修改操作",string(event.Kv.Value),"Revision",event.Kv.CreateRevision,event.Kv.ModRevision)
+				fmt.Println("修改操作", string(event.Kv.Value), "Revision", event.Kv.CreateRevision, event.Kv.ModRevision)
 			case mvccpb.DELETE:
-				fmt.Println("删除操作","Revision",event.Kv.ModRevision)
+				fmt.Println("删除操作", "Revision", event.Kv.ModRevision)
 			}
 		}
 	}

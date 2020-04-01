@@ -13,13 +13,13 @@ type CronJob struct {
 	nextTime time.Time
 }
 
-func main()  {
+func main() {
 	//需要有一个调度协程 它定时检查所有的Cron任务 谁过期了就执行谁
 
 	var (
 		cronJob *CronJob
-		expr *cronexpr.Expression
-		now time.Time
+		expr    *cronexpr.Expression
+		now     time.Time
 		//定义一个调度表
 		scheduleTable map[string]*CronJob //key:任务的名字
 	)
@@ -54,31 +54,31 @@ func main()  {
 		var (
 			jobName string
 			cronJob *CronJob
-			now time.Time
+			now     time.Time
 		)
 		//定时检查一下调度任务表
 		for {
 			now = time.Now()
 
-			for jobName,cronJob = range scheduleTable{
+			for jobName, cronJob = range scheduleTable {
 				//判断是否过期 如果下次执行任务时间早于当前
 				if cronJob.nextTime.Before(now) || cronJob.nextTime.Equal(now) {
 					// 启动一个协成 执行这个任务
 					go func(jobName string) {
-						fmt.Println("执行",jobName)
+						fmt.Println("执行", jobName)
 					}(jobName)
 
 					//计数下一次操作时间
 					cronJob.nextTime = cronJob.expr.Next(now)
-					fmt.Println("下次执行时间是",cronJob.nextTime)
+					fmt.Println("下次执行时间是", cronJob.nextTime)
 
 				}
 			}
 			//睡眠100毫秒
 			select {
-			case <- time.NewTimer(100 *time.Millisecond).C:
+			case <-time.NewTimer(100 * time.Millisecond).C:
 			}
 		}
 	}()
-	time.Sleep(100 *time.Second)
+	time.Sleep(100 * time.Second)
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"prepare/cron/master"
 	"runtime"
+	"time"
 )
 
 var (
@@ -39,12 +40,20 @@ func main() {
 		goto ERR
 	}
 
+	//启动任务管理器
+	if err = master.InitJobMgr(); err != nil {
+		goto ERR
+	}
+
 	// 启动Api HTTP服务
 	if err = master.InitApiServer(); err != nil {
 		goto ERR
 	}
 
 	//正常退出
+	for {
+		time.Sleep(1 * time.Second)
+	}
 	return
 
 	//错误打印到屏幕上 如果启动失败 可以看到错误原因

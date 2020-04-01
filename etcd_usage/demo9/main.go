@@ -9,24 +9,24 @@ import (
 
 func main() {
 	var (
-		config clientv3.Config
-		client *clientv3.Client
-		err error
-		lease clientv3.Lease
+		config         clientv3.Config
+		client         *clientv3.Client
+		err            error
+		lease          clientv3.Lease
 		leaseGrantResp *clientv3.LeaseGrantResponse
-		leaseId clientv3.LeaseID
-		keepRespChan <-chan *clientv3.LeaseKeepAliveResponse
-		keepResp *clientv3.LeaseKeepAliveResponse
-		ctx context.Context
-		cancelFunc context.CancelFunc
-		kv clientv3.KV
-		txn clientv3.Txn
-		txnResp *clientv3.TxnResponse
+		leaseId        clientv3.LeaseID
+		keepRespChan   <-chan *clientv3.LeaseKeepAliveResponse
+		keepResp       *clientv3.LeaseKeepAliveResponse
+		ctx            context.Context
+		cancelFunc     context.CancelFunc
+		kv             clientv3.KV
+		txn            clientv3.Txn
+		txnResp        *clientv3.TxnResponse
 	)
 
 	// 客户端配置
 	config = clientv3.Config{
-		Endpoints: []string{"127.0.0.1:2379"},
+		Endpoints:   []string{"127.0.0.1:2379"},
 		DialTimeout: 5 * time.Second,
 	}
 
@@ -69,11 +69,11 @@ func main() {
 	go func() {
 		for {
 			select {
-			case keepResp = <- keepRespChan:
+			case keepResp = <-keepRespChan:
 				if keepRespChan == nil {
 					fmt.Println("租约已经失效了")
 					goto END
-				} else {	// 每秒会续租一次, 所以就会受到一次应答
+				} else { // 每秒会续租一次, 所以就会受到一次应答
 					fmt.Println("收到自动续租应答:", keepResp.ID)
 				}
 			}
